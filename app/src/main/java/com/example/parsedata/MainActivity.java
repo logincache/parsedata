@@ -41,6 +41,7 @@ public class MainActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerView);
         refreshLayout = findViewById(R.id.swipeLayout);
         recyclerView.setHasFixedSize(true);
+        recyclerView.setNestedScrollingEnabled(false);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         adapter = new ParseAdapter(parseItems, this);
         recyclerView.setAdapter(adapter);
