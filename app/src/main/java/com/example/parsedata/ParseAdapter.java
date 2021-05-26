@@ -1,6 +1,5 @@
 package com.example.parsedata;
 
-import android.app.SearchManager;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -66,7 +64,7 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            String site = "https://youla.ru";//добавить сайты
+            String site = "https://youla.ru";//добавить сайты Доделать на все сайты
             ParseItem parseItem = parseItems.get(position);
             String urlString = site+parseItem.getDetailUrl();
             Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlString));

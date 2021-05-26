@@ -1,11 +1,14 @@
 package com.example.parsedata;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -27,18 +30,20 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<ParseItem> parseItems = new ArrayList<>();
     private ProgressBar progressBar;
     private SwipeRefreshLayout refreshLayout;
+    private ImageButton settings_button1;
 
+    @SuppressLint("WrongViewCast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.activity_main);
 
-
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
         getSupportActionBar().hide();//Full Screen Activity in Android
 
+        settings_button1 = (ImageButton) findViewById(R.id.settings_button);//imageButton)))
         progressBar = findViewById(R.id.progressBar);
         recyclerView = findViewById(R.id.recyclerView);
         refreshLayout = findViewById(R.id.swipeLayout);
@@ -55,8 +60,24 @@ public class MainActivity extends AppCompatActivity {
                 loadItems();
             }
         });
+
+
+
+        settings_button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openActivity();
+            }
+        });
+
     }
-            private void loadItems() {
+
+    private void openActivity() {
+        Intent openActivity = new Intent(MainActivity.this, SettingsActivity.class);
+        startActivity(openActivity);
+    }
+
+    private void loadItems() {
                 Content content = new Content();
                 content.execute();
             }
@@ -134,7 +155,7 @@ public class MainActivity extends AppCompatActivity {
                 String arg = "&page=";
                 String url = "https://youla.ru/petrozavodsk?q=красная%20куртка";
                             //https://youla.ru/petrozavodsk?q=красная%20куртка&page=1
-                for(int j = 0; j < 3;j++) {//кол-во страниц парсинга J
+                for(int j = 0; j < 7;j++) {//кол-во страниц парсинга J
                     Document doc = Jsoup.connect((url)+ arg + j).get();//+ добавлять фильтры поиска
                     Log.d("createurl", "URLpage"+ j);
                             Elements data = doc.select("li.product_item");

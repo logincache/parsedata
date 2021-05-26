@@ -19,7 +19,7 @@ public class  ParseItem {
 
     public String getImgUrl() {
         if (imgUrl.isEmpty()) {
-          imgUrl = "https://www.vivicetona.it/wp-content/uploads/2017/05/noImg_2-1.jpg";
+          imgUrl = "https://www.vivicetona.it/wp-content/uploads/2017/05/noImg_2-1.jpg";//
         }else {
             return imgUrl;
         }
