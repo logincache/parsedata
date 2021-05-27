@@ -3,7 +3,9 @@ package com.example.parsedata;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.squareup.picasso.Picasso;
@@ -64,20 +67,52 @@ public class ParseAdapter extends RecyclerView.Adapter<ParseAdapter.ViewHolder> 
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
-            String site = "https://youla.ru";//добавить сайты Доделать на все сайты
-            ParseItem parseItem = parseItems.get(position);
-            String urlString = site+parseItem.getDetailUrl();
-            Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlString));
-            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-            intent.setPackage("com.android.chrome");
-            try {
-                context.startActivity(intent);
-            } catch (ActivityNotFoundException ex) {
-                // Chrome browser presumably not installed so allow user to choose instead
-                intent.setPackage(null);
-                context.startActivity(intent);
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context.getApplicationContext());
+            String site = prefs.getString("list_sites", "");
+            Log.d("parcity", "parcity: " + site);
+            if (site.equals("Ebay")) {
+                ParseItem parseItem = parseItems.get(position);
+                String urlString = parseItem.getDetailUrl();
+                Log.d("urlString", "urlString: " + urlString);
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlString));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setPackage("com.android.chrome");
+
+                try {
+                    context.startActivity(intent);
+                } catch (ActivityNotFoundException ex) {
+                    // Chrome browser presumably not installed so allow user to choose instead
+                    intent.setPackage(null);
+                    context.startActivity(intent);
+                }
+
+
+
+            } else {
+                String domen = "";
+                String http = "https://";
+                domen = ".ru";
+
+
+                ParseItem parseItem = parseItems.get(position);
+                String urlString = http + site + domen + parseItem.getDetailUrl();
+                Log.d("urlString", "urlString: " + urlString);
+
+                Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(urlString));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setPackage("com.android.chrome");
+
+                try {
+                    context.startActivity(intent);
+                } catch (ActivityNotFoundException ex) {
+                    // Chrome browser presumably not installed so allow user to choose instead
+                    intent.setPackage(null);
+                    context.startActivity(intent);
+                }
             }
         }
+
 
 
     }

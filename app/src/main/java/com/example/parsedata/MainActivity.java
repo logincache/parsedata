@@ -110,18 +110,79 @@ public class MainActivity extends AppCompatActivity {
             SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
             String list_sites = prefs.getString("list_sites", "");
             String list_city = prefs.getString("list_city", "");
-            String signature = prefs.getString("signature", "");
+            String find = prefs.getString("signature", "");
 
-            new CityChange(list_city);
+            if (list_city.equals("Петрозаводск")) {
+                list_city="petrozavodsk";
+            }
+            if (list_city.equals("Санкт-Петербург")) {
+                list_city="sankt-peterburg";
 
+            }
+            if (list_city.equals("Москва")) {
+                list_city="moskva";
+
+            }
+            if (list_city.equals("Краснодар")) {
+                list_city="krasnodar";
+            }
+
+           Log.d("list_city", "list_city: " + list_city);
             switch (list_sites) {
                 case "Avito":
                     try {
+                        String url = "https://";
+                        String domen = ".ru/";
+                        String pref = "?q=";
                         String arg = "&page=";
-                        String url = "https://youla.ru/petrozavodsk?q=красная%20куртка";
-                        //https://youla.ru/petrozavodsk?q=красная%20куртка&page=1
+                        for (int j = 0; j < 5; j++) {//кол-во страниц парсинга J
+                            Log.d("find", "find: " + (url) +list_sites+domen+list_city+pref+find+arg + j);
+                            Document doc = Jsoup.connect((url) +list_sites+domen+list_city+pref+find+arg + j).get();//+ добавлять фильтры поиска
+                            Log.d("createurl", "URLpage" + j);
+
+                            Elements data = doc.select("div.iva-item-content-m2FiN");
+
+                        int size = data.size();
+                        Log.d("doc", "doc: "+doc);
+                        Log.d("data", "data: "+data);
+                        Log.d("size", ""+size);
+                        for (int i = 0; i < size; i++) {
+                            String imgUrl = data.select("img.photo-slider-image-1fpZZ")
+                                    .eq(i)
+                                    .attr("src");
+
+                            String title = data.select("h3")
+                                    .eq(i)
+                                    .text();
+
+                            String detailUrl = data.select("div.iva-item-titleStep-2bjuh")
+                                    .select("a")
+                                    .eq(i)
+                                    .attr("href");
+
+                            String price = data.select("span.price-price-32bra")
+                                    .eq(i)
+                                    .text();
+                            parseItems.add(new ParseItem(imgUrl, title, price, detailUrl));
+
+                            Log.d("items", "img: " + imgUrl + " . title: " + title + " price: " + price +" detlAvito"+detailUrl);
+                        }
+                        }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+
+                    break;
+                case "Youla":
+                    try {
+                        String url = "https://";
+                        String domen = ".ru/";
+                        String pref = "?q=";
+                        String arg = "&page=";
                         for (int j = 0; j < 7; j++) {//кол-во страниц парсинга J
-                            Document doc = Jsoup.connect((url) + arg + j).get();//+ добавлять фильтры поиска
+                            Log.d("find", "find: " + (url) +list_sites+domen+list_city+pref+find+arg + j);
+                            Document doc = Jsoup.connect((url) +list_sites+domen+list_city+pref+find+arg + j).get();//+ добавлять фильтры поиска
                             Log.d("createurl", "URLpage" + j);
                             Elements data = doc.select("li.product_item");
                             int size = data.size();
@@ -155,18 +216,54 @@ public class MainActivity extends AppCompatActivity {
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-
-                    break;
-                case "Youla":
-                    System.out.println("Today is sunny !");
                     break;
                 case "Ebay":
-                    System.out.println("Today is rainy!");
-                    break;
+                        try {
+                            //https://www.ebay.com/sch/i.html?_nkw=толстовка&_sacat=0&_pgn=3
+                            String url = "https://";
+                            String domen = ".com/";
+                            String pref = "sch/i.html?_nkw=";
+                            String arg = "&_sacat=0&_pgn=";
+                            for (int j = 0; j < 5; j++) {//кол-во страниц парсинга J
+                                Log.d("find", "find: " + (url) + list_sites + domen + pref + find + arg + j);
+                                Document doc = Jsoup.connect((url) + list_sites + domen + pref + find + arg + j).get();//+ добавлять фильтры поиска
+                                Log.d("createurl", "URLpage" + j);
+
+                                Elements data = doc.select("li.s-item");
+
+                                int size = data.size();
+                                Log.d("doc", "doc: " + doc);
+                                Log.d("data", "data: " + data);
+                                Log.d("size", "" + size);
+                                for (int i = 0; i < size; i++) {
+                                    String imgUrl = data.select("img.s-item__image-img")
+                                            .eq(i)
+                                            .attr("src");
+
+                                    String title = data.select("h3")
+                                            .eq(i)
+                                            .text();
+
+                                    String detailUrl = data.select("div.s-item__image")
+                                            .select("a")
+                                            .eq(i)
+                                            .attr("href");
+
+                                    String price = data.select("span.s-item__price")
+                                            .eq(i)
+                                            .text();
+                                    parseItems.add(new ParseItem(imgUrl, title, price, detailUrl));
+                                    Log.d("items", "img: " + imgUrl + " . title: " + title + " price: " + price +" detalUrlEbay " + detailUrl);
+                                }
+                            }
+
+                        }catch (IOException e) {
+                         e.printStackTrace();
+                         }
+                        break;
 
 
-
-            }
+                }
 
 
             return null;
