@@ -2,6 +2,7 @@ package com.example.parsedata;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.ProgressBar;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
@@ -53,6 +55,7 @@ public class MainActivity extends AppCompatActivity {
         adapter = new ParseAdapter(parseItems, this);
         recyclerView.setAdapter(adapter);
 
+
         loadItems();
         refreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -60,7 +63,6 @@ public class MainActivity extends AppCompatActivity {
                 loadItems();
             }
         });
-
 
 
         settings_button1.setOnClickListener(new View.OnClickListener() {
@@ -78,57 +80,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadItems() {
-                Content content = new Content();
-                content.execute();
-            }
+        Content content = new Content();
+        content.execute();
+    }
 
 
-
-//    @Override
-//    public boolean onCreateOptionsMenu(Menu menu) {
-//        getMenuInflater().inflate(R.menu.toolbar_item, menu);
-//
-//        MenuItem searchViewItem = menu.findItem(R.id.action_search);
-//        // Get the search view and set the searchable configuration
-//        SearchManager searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
-//        SearchView searchView = (SearchView) searchViewItem.getActionView();
-//        searchView.setQueryHint("Search...");
-//        searchView.setSearchableInfo(searchManager.getSearchableInfo(getComponentName()));
-//        searchView.setIconifiedByDefault(false); //Do not iconfy the widget; expand it by default
-//
-//        SearchView.OnQueryTextListener queryTextListener = new SearchView.OnQueryTextListener() {
-//            @Override
-//            public boolean onQueryTextSubmit(String s) {
-//                return false;
-//            }
-//
-//            @Override
-//            public boolean onQueryTextChange(String newText) {
-//
-//                newText = newText.toLowerCase();
-//                ArrayList<ParseItem> newList = new ArrayList<>();
-//                for (ParseItem parseItem : parseItems) {
-//                    String title = parseItem.getTitle().toLowerCase();
-//
-//                    // you can specify as many conditions as you like
-//                    if (title.contains(newText)) {
-//                        newList.add(parseItem);
-//                    }
-//                }
-//                // create method in adapter
-//                adapter.setFilter(newList);
-//
-//                return true;
-//            }
-//        };
-//
-//        searchView.setOnQueryTextListener(queryTextListener);
-//
-//        return true;
-//
-//    }
-
-    private class Content extends AsyncTask<Void,Void,Void>{
+    private class Content extends AsyncTask<Void, Void, Void> {
 
         @Override
         protected void onPreExecute() {
@@ -150,114 +107,70 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Void doInBackground(Void... voids) {
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getBaseContext());
+            String list_sites = prefs.getString("list_sites", "");
+            String list_city = prefs.getString("list_city", "");
+            String signature = prefs.getString("signature", "");
 
-            try {
-                String arg = "&page=";
-                String url = "https://youla.ru/petrozavodsk?q=красная%20куртка";
-                            //https://youla.ru/petrozavodsk?q=красная%20куртка&page=1
-                for(int j = 0; j < 7;j++) {//кол-во страниц парсинга J
-                    Document doc = Jsoup.connect((url)+ arg + j).get();//+ добавлять фильтры поиска
-                    Log.d("createurl", "URLpage"+ j);
+            new CityChange(list_city);
+
+            switch (list_sites) {
+                case "Avito":
+                    try {
+                        String arg = "&page=";
+                        String url = "https://youla.ru/petrozavodsk?q=красная%20куртка";
+                        //https://youla.ru/petrozavodsk?q=красная%20куртка&page=1
+                        for (int j = 0; j < 7; j++) {//кол-во страниц парсинга J
+                            Document doc = Jsoup.connect((url) + arg + j).get();//+ добавлять фильтры поиска
+                            Log.d("createurl", "URLpage" + j);
                             Elements data = doc.select("li.product_item");
-                    int size = data.size();
-                    Log.d("doc", "doc: " + doc);
-                    Log.d("data", "data: " + data);
-                    Log.d("size", "" + size);
-                    for (int i = 0; i < size; i++) {
-                        String imgUrl = data.select("div.product_item__image")
-                                .select("image")
-                                .eq(i)
-                                .attr("xlink:href");
+                            int size = data.size();
+                            Log.d("doc", "doc: " + doc);
+                            Log.d("data", "data: " + data);
+                            Log.d("size", "" + size);
+                            for (int i = 0; i < size; i++) {
+                                String imgUrl = data.select("div.product_item__image")
+                                        .select("image")
+                                        .eq(i)
+                                        .attr("xlink:href");
 
-                        String title = data.select("div.product_item__title")
-                                .select("div")
-                                .eq(i)
-                                .text();
+                                String title = data.select("div.product_item__title")
+                                        .select("div")
+                                        .eq(i)
+                                        .text();
 
-                        String detailUrl = data.select("a")
-                                .eq(i)
-                                .attr("href");
+                                String detailUrl = data.select("a")
+                                        .eq(i)
+                                        .attr("href");
 
-                        String price = data.select("div.product_item__description")
-                                .eq(i)
-                                .text()
-                                .replace("руб.", "");//убирает руб.
-                        parseItems.add(new ParseItem(imgUrl, title, price, detailUrl));
-                        Log.d("items", "img: " + imgUrl + " . title: " + title + " price: " + price + " detal url: " + detailUrl);
+                                String price = data.select("div.product_item__description")
+                                        .eq(i)
+                                        .text()
+                                        .replace("руб.", "");//убирает руб.
+                                parseItems.add(new ParseItem(imgUrl, title, price, detailUrl));
+                                Log.d("items", "img: " + imgUrl + " . title: " + title + " price: " + price + " detal url: " + detailUrl);
+                            }
+                        }
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
-                }
 
-            } catch (IOException e) {
-                e.printStackTrace();
+                    break;
+                case "Youla":
+                    System.out.println("Today is sunny !");
+                    break;
+                case "Ebay":
+                    System.out.println("Today is rainy!");
+                    break;
+
+
+
             }
 
-//            try {
-//            String url = "https://m.avito.ru/petrozavodsk/tovary_dlya_kompyutera/monitory-ASgBAgICAUTGB4Bo?context=H4sIAAAAAAAA_wFCAL3_YToxOntzOjU6Inhfc2d0IjtzOjQwOiI4YjY0YjZmNDlmNmQyMGM3ZTVkMjNiY2FkZmVlMmYxYWQ5Y2RkMGUzIjt9snV-4kIAAAA";//avito
-//            Document doc = Jsoup.connect(url).get();
-//
-//            Elements data = doc.select("div.iva-item-content-m2FiN");
-//
-//            int size = data.size();
-//            Log.d("doc", "doc: "+doc);
-//            Log.d("data", "data: "+data);
-//            Log.d("size", ""+size);
-//            for (int i = 0; i < size; i++) {
-//                String imgUrl = data.select("img.photo-slider-image-1fpZZ")
-//                        .eq(i)
-//                        .attr("src");
-//
-//                String title = data.select("h3")
-//                        .eq(i)
-//                        .text();
-//
-//                String detailUrl = data.select("a")
-//                        .eq(i)
-//                        .attr("href");
-//
-//                String price = data.select("span.price-price-32bra")
-//                        .eq(i)
-//                        .text();
-//                parseItems.add(new ParseItem(imgUrl, title, price, detailUrl));
-//                Log.d("items", "img: " + imgUrl + " . title: " + title + " price: " + price);
-//            }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//            try {
-//                String url = "https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2380057.m570.l1313&_nkw=монитор&_sacat=0";//ebay
-//                Document doc = Jsoup.connect(url).get();
-//
-//                Elements data = doc.select("li.s-item");
-//
-//                int size = data.size();
-//                Log.d("doc", "doc: "+doc);
-//                Log.d("data", "data: "+data);
-//                Log.d("size", ""+size);
-//                for (int i = 0; i < size; i++) {
-//                    String imgUrl = data.select("img.s-item__image-img")
-//                            .eq(i)
-//                            .attr("src");
-//
-//                    String title = data.select("h3")
-//                            .eq(i)
-//                            .text();
-//
-//                    String detailUrl = data.select("a")
-//                            .eq(i)
-//                            .attr("href");
-//
-//                    String price = data.select("span.s-item__price")
-//                            .eq(i)
-//                            .text();
-//                    parseItems.add(new ParseItem(imgUrl, title, price, detailUrl));
-//                    Log.d("items", "img: " + imgUrl + " . title: " + title + " price: " + price);
-//                }
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-////
-////
-           return null;
+
+            return null;
         }
     }
+
 }
