@@ -28,25 +28,33 @@
             android:layout_gravity="bottom"
             android:src="@drawable/gradient" />
 
-          <TextView
+        <TextView
             android:id="@+id/textView"
             style="@style/TextAppearance.AppCompat.Medium"
-            android:layout_width="384dp"
-            android:layout_height="81dp"
+            android:layout_width="374dp"
+            android:layout_height="118dp"
             android:layout_gravity="bottom"
             android:layout_margin="12dp"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="10"
             android:text="Title"
             android:textColor="#fff" />
 
-          <TextView
+        <TextView
             android:id="@+id/priceView"
             style="@style/TextAppearance.AppCompat.Medium"
             android:layout_width="374dp"
             android:layout_height="52dp"
             android:layout_gravity="bottom"
             android:layout_margin="12dp"
+            android:shadowColor="#000000"
+            android:shadowDx="0"
+            android:shadowDy="0"
+            android:shadowRadius="10"
             android:text="Price"
-            android:textColor="#77FF00" />
+            android:textColor="#4DB670" />
 
     </androidx.cardview.widget.CardView>
 

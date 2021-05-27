@@ -137,7 +137,7 @@ public class MainActivity extends AppCompatActivity {
                         String arg = "&page=";
                         for (int j = 0; j < 5; j++) {//кол-во страниц парсинга J
                             Log.d("find", "find: " + (url) +list_sites+domen+list_city+pref+find+arg + j);
-                            Document doc = Jsoup.connect((url) +list_sites+domen+list_city+pref+find+arg + j).get();//+ добавлять фильтры поиска
+                            Document doc = Jsoup.connect((url) +list_sites+domen+list_city+pref+find+arg + j).get();
                             Log.d("createurl", "URLpage" + j);
 
                             Elements data = doc.select("div.iva-item-content-m2FiN");
@@ -180,7 +180,7 @@ public class MainActivity extends AppCompatActivity {
                         String domen = ".ru/";
                         String pref = "?q=";
                         String arg = "&page=";
-                        for (int j = 0; j < 7; j++) {//кол-во страниц парсинга J
+                        for (int j = 0; j < 5; j++) {//кол-во страниц парсинга J
                             Log.d("find", "find: " + (url) +list_sites+domen+list_city+pref+find+arg + j);
                             Document doc = Jsoup.connect((url) +list_sites+domen+list_city+pref+find+arg + j).get();//+ добавлять фильтры поиска
                             Log.d("createurl", "URLpage" + j);
